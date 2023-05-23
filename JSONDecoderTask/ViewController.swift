@@ -25,8 +25,8 @@ final class ViewController: UIViewController {
     }
 
     private func getData(url: URL?) {
-        guard let url = url else { return }
-        URLSession.shared.dataTask(with: url) { data, response, error in
+        guard let url = url else { fatalError("Can't create URL") }
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
 
             if let error = error {
                 print(error)
@@ -37,7 +37,7 @@ final class ViewController: UIViewController {
                 return
             }
 
-            guard let data = data else {
+            guard let data = data, response.statusCode == 200 else {
                 print("No data")
                 return
             }
@@ -47,7 +47,7 @@ final class ViewController: UIViewController {
             do {
                 let jsonData = try JSONDecoder().decode(Cards.self, from: data)
                 guard let card = jsonData.cards.first else { return }
-                self.printCardInfo(card: card)
+                self?.printCardInfo(card: card)
             } catch {
                 print(error)
             }
